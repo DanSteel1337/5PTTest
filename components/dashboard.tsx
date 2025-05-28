@@ -248,6 +248,10 @@ function DashboardContent() {
                     </div>
                   </div>
                   <div>
+                    <Label className="text-sm font-medium">Direct Referrals' Deposits</Label>
+                    <p className="text-lg font-semibold">{investmentContract.investorInfo.directRefsDeposit} 5PT</p>
+                  </div>
+                  <div>
                     <Label className="text-sm font-medium">Referrer</Label>
                     <p className="text-sm font-mono bg-muted p-2 rounded">
                       {investmentContract.investorInfo.referer === "0x0000000000000000000000000000000000000000"
@@ -281,6 +285,7 @@ function DashboardContent() {
                           pool.id,
                           investmentContract.investorInfo.totalDepositAmount,
                           Number(investmentContract.investorInfo.directReferralsCount),
+                          investmentContract.investorInfo.directRefsDeposit,
                           investmentContract.pools,
                         )
                       : false
@@ -289,7 +294,7 @@ function DashboardContent() {
                       <div key={pool.id} className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <h4 className="font-medium">Pool {pool.id}</h4>
+                            <h4 className="font-medium">Pool {pool.id + 1}</h4>
                             <Badge variant={pool.isActive ? "default" : "secondary"}>
                               {pool.isActive ? "Active" : "Inactive"}
                             </Badge>
@@ -301,7 +306,7 @@ function DashboardContent() {
                           </div>
                           <p className="text-sm text-muted-foreground">
                             Min Investment: {pool.minInvestmentAmount} 5PT | Min Referrals:{" "}
-                            {pool.minDirectReferralsCount}
+                            {pool.minDirectReferralsCount} | Min Ref Volume: {pool.minDirectReferralsDeposit} 5PT
                           </p>
                         </div>
                         <div className="text-right space-y-1">
