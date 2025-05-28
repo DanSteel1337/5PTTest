@@ -6,7 +6,6 @@ import { WagmiProvider } from "wagmi"
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit"
 import { config } from "@/lib/config"
 import { useState, useEffect } from "react"
-import { RainbowKitStyles } from "@/lib/rainbowkit-styles"
 
 export function Providers({
   children,
@@ -41,7 +40,6 @@ export function Providers({
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider theme={null} modalSize="compact">
-          <RainbowKitStyles />
           {children}
         </RainbowKitProvider>
       </QueryClientProvider>

@@ -1,8 +1,8 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
+import "@rainbow-me/rainbowkit/styles.css"
 import "./globals.css"
-// Remove direct CSS import - we'll handle it in a different way
 
 const inter = Inter({ subsets: ["latin"] })
 
