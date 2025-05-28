@@ -23,14 +23,20 @@ export function TestRunner() {
   const [runningTests, setRunningTests] = useState(false)
   const [progress, setProgress] = useState(0)
 
+  // First effect just for mounting
   useEffect(() => {
     setMounted(true)
-    if (mounted) {
-      const categories = getAllTestCategories(tokenContract, investmentContract, address)
-      setTestCategories(categories)
-      if (categories.length > 0 && !selectedCategory) {
-        setSelectedCategory(categories[0].name)
-      }
+  }, [])
+
+  // Second effect for loading test categories after mounting
+  useEffect(() => {
+    if (!mounted) return
+
+    const categories = getAllTestCategories(tokenContract, investmentContract, address || "")
+    setTestCategories(categories)
+
+    if (categories.length > 0 && !selectedCategory) {
+      setSelectedCategory(categories[0].name)
     }
   }, [mounted, tokenContract, investmentContract, address, selectedCategory])
 
