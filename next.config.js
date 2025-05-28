@@ -12,6 +12,14 @@ const nextConfig = {
   },
   webpack: (config) => {
     config.resolve.fallback = { fs: false, net: false, tls: false }
+
+    // Add special handling for RainbowKit CSS
+    config.module.rules.push({
+      test: /\.css$/,
+      use: ["style-loader", "css-loader"],
+      include: /node_modules\/@rainbow-me\/rainbowkit/,
+    })
+
     return config
   },
 }

@@ -3,9 +3,10 @@
 import type React from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { WagmiProvider } from "wagmi"
-import { RainbowKitProvider, darkTheme } from "@rainbow-me/rainbowkit"
+import { RainbowKitProvider } from "@rainbow-me/rainbowkit"
 import { config } from "@/lib/config"
 import { useState, useEffect } from "react"
+import { RainbowKitStyles } from "@/lib/rainbowkit-styles"
 
 export function Providers({
   children,
@@ -39,13 +40,8 @@ export function Providers({
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider
-          theme={darkTheme({
-            accentColor: "#F0B90B",
-            accentColorForeground: "white",
-          })}
-          modalSize="compact"
-        >
+        <RainbowKitProvider theme={null} modalSize="compact">
+          <RainbowKitStyles />
           {children}
         </RainbowKitProvider>
       </QueryClientProvider>
