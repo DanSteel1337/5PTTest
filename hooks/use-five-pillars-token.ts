@@ -4,66 +4,66 @@ import { useReadContracts, useWriteContract, useAccount, useChainId } from "wagm
 import { FIVE_PILLARS_TOKEN_ABI } from "@/lib/abis"
 import { getContractAddress } from "@/lib/config"
 import { formatUnits, parseUnits } from "viem"
-import { useState, useEffect } from "react"
 
 export function useFivePillarsToken() {
   const { address } = useAccount()
   const chainId = useChainId()
-  const [mounted, setMounted] = useState(false)
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  // Always get the contract address, even if it might be undefined
+  const contractAddress = getContractAddress(chainId, "fivePillarsToken")
 
-  const contractAddress = mounted ? getContractAddress(chainId, "fivePillarsToken") : undefined
+  // Always call hooks unconditionally
   const { writeContract, isPending, error } = useWriteContract()
+
+  // Build contracts array conditionally but call useReadContracts unconditionally
+  const contracts = contractAddress
+    ? [
+        {
+          address: contractAddress,
+          abi: FIVE_PILLARS_TOKEN_ABI,
+          functionName: "name",
+        },
+        {
+          address: contractAddress,
+          abi: FIVE_PILLARS_TOKEN_ABI,
+          functionName: "symbol",
+        },
+        {
+          address: contractAddress,
+          abi: FIVE_PILLARS_TOKEN_ABI,
+          functionName: "decimals",
+        },
+        {
+          address: contractAddress,
+          abi: FIVE_PILLARS_TOKEN_ABI,
+          functionName: "totalSupply",
+        },
+        {
+          address: contractAddress,
+          abi: FIVE_PILLARS_TOKEN_ABI,
+          functionName: "owner",
+        },
+        ...(address
+          ? [
+              {
+                address: contractAddress,
+                abi: FIVE_PILLARS_TOKEN_ABI,
+                functionName: "balanceOf",
+                args: [address],
+              },
+            ]
+          : []),
+      ]
+    : []
 
   const {
     data: tokenData,
     isLoading,
     refetch,
   } = useReadContracts({
-    contracts: mounted
-      ? [
-          {
-            address: contractAddress,
-            abi: FIVE_PILLARS_TOKEN_ABI,
-            functionName: "name",
-          },
-          {
-            address: contractAddress,
-            abi: FIVE_PILLARS_TOKEN_ABI,
-            functionName: "symbol",
-          },
-          {
-            address: contractAddress,
-            abi: FIVE_PILLARS_TOKEN_ABI,
-            functionName: "decimals",
-          },
-          {
-            address: contractAddress,
-            abi: FIVE_PILLARS_TOKEN_ABI,
-            functionName: "totalSupply",
-          },
-          {
-            address: contractAddress,
-            abi: FIVE_PILLARS_TOKEN_ABI,
-            functionName: "owner",
-          },
-          ...(address
-            ? [
-                {
-                  address: contractAddress,
-                  abi: FIVE_PILLARS_TOKEN_ABI,
-                  functionName: "balanceOf",
-                  args: [address],
-                },
-              ]
-            : []),
-        ]
-      : [],
+    contracts,
     query: {
-      enabled: !!contractAddress && mounted,
+      enabled: !!contractAddress,
       refetchInterval: 10000,
     },
   })
@@ -158,26 +158,14 @@ export function useFivePillarsToken() {
     }
   }
 
-  // Default values for when not mounted
-  if (!mounted) {
-    return {
-      contractAddress: undefined,
-      tokenData: {
-        name: "Five Pillars Token",
-        symbol: "5PT",
-        decimals: 18,
-        totalSupply: "0",
-        owner: "0x0000000000000000000000000000000000000000",
-        balance: "0",
-      },
-      isLoading: true,
-      isPending: false,
-      error: null,
-      refetch: () => {},
-      transfer,
-      approve,
-      setInvestmentManager,
-    }
+  // Default values
+  const defaultTokenData = {
+    name: "Five Pillars Token",
+    symbol: "5PT",
+    decimals: 18,
+    totalSupply: "0",
+    owner: "0x0000000000000000000000000000000000000000",
+    balance: "0",
   }
 
   // Parse token data with proper null checks
@@ -190,14 +178,7 @@ export function useFivePillarsToken() {
         owner: tokenData[4]?.result || "0x0000000000000000000000000000000000000000",
         balance: address && tokenData[5]?.result !== undefined ? formatUnits(tokenData[5].result, 18) : "0",
       }
-    : {
-        name: "Five Pillars Token",
-        symbol: "5PT",
-        decimals: 18,
-        totalSupply: "0",
-        owner: "0x0000000000000000000000000000000000000000",
-        balance: "0",
-      }
+    : defaultTokenData
 
   return {
     contractAddress,

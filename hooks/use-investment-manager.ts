@@ -4,90 +4,90 @@ import { useReadContracts, useWriteContract, useAccount, useChainId } from "wagm
 import { INVESTMENT_MANAGER_ABI } from "@/lib/abis"
 import { getContractAddress } from "@/lib/config"
 import { formatUnits, parseUnits } from "viem"
-import { useState, useEffect } from "react"
 
 export function useInvestmentManager() {
   const { address } = useAccount()
   const chainId = useChainId()
-  const [mounted, setMounted] = useState(false)
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  // Always get the contract address, even if it might be undefined
+  const contractAddress = getContractAddress(chainId, "investmentManager")
 
-  const contractAddress = mounted ? getContractAddress(chainId, "investmentManager") : undefined
+  // Always call hooks unconditionally
   const { writeContract, isPending, error } = useWriteContract()
+
+  // Build contracts array conditionally but call useReadContracts unconditionally
+  const contracts = [
+    // Core reward data
+    ...(address && contractAddress
+      ? [
+          {
+            address: contractAddress,
+            abi: INVESTMENT_MANAGER_ABI,
+            functionName: "getAccumulatedRewards",
+            account: address,
+          },
+        ]
+      : []),
+    ...(address && contractAddress
+      ? [
+          {
+            address: contractAddress,
+            abi: INVESTMENT_MANAGER_ABI,
+            functionName: "getLastRoundRewards",
+            account: address,
+          },
+        ]
+      : []),
+    // Investor information
+    ...(address && contractAddress
+      ? [
+          {
+            address: contractAddress,
+            abi: INVESTMENT_MANAGER_ABI,
+            functionName: "accountToInvestorInfo",
+            args: [address],
+          },
+        ]
+      : []),
+    // System statistics
+    ...(contractAddress
+      ? [
+          {
+            address: contractAddress,
+            abi: INVESTMENT_MANAGER_ABI,
+            functionName: "getTotalInvestorsCount",
+          },
+          {
+            address: contractAddress,
+            abi: INVESTMENT_MANAGER_ABI,
+            functionName: "totalDepositAmount",
+          },
+          {
+            address: contractAddress,
+            abi: INVESTMENT_MANAGER_ABI,
+            functionName: "startTimestamp",
+          },
+        ]
+      : []),
+    // All 9 pools data
+    ...(contractAddress
+      ? Array.from({ length: 9 }, (_, i) => ({
+          address: contractAddress,
+          abi: INVESTMENT_MANAGER_ABI,
+          functionName: "pools",
+          args: [BigInt(i)],
+        }))
+      : []),
+  ]
 
   const {
     data: contractData,
     isLoading,
     refetch,
   } = useReadContracts({
-    contracts: [
-      // Core reward data
-      ...(address && mounted
-        ? [
-            {
-              address: contractAddress,
-              abi: INVESTMENT_MANAGER_ABI,
-              functionName: "getAccumulatedRewards",
-              account: address,
-            },
-          ]
-        : []),
-      ...(address && mounted
-        ? [
-            {
-              address: contractAddress,
-              abi: INVESTMENT_MANAGER_ABI,
-              functionName: "getLastRoundRewards",
-              account: address,
-            },
-          ]
-        : []),
-      // Investor information
-      ...(address && mounted
-        ? [
-            {
-              address: contractAddress,
-              abi: INVESTMENT_MANAGER_ABI,
-              functionName: "accountToInvestorInfo",
-              args: [address],
-            },
-          ]
-        : []),
-      // System statistics
-      ...(mounted
-        ? [
-            {
-              address: contractAddress,
-              abi: INVESTMENT_MANAGER_ABI,
-              functionName: "getTotalInvestorsCount",
-            },
-            {
-              address: contractAddress,
-              abi: INVESTMENT_MANAGER_ABI,
-              functionName: "totalDepositAmount",
-            },
-            {
-              address: contractAddress,
-              abi: INVESTMENT_MANAGER_ABI,
-              functionName: "startTimestamp",
-            },
-          ]
-        : []),
-      // All 9 pools data
-      ...(mounted
-        ? Array.from({ length: 9 }, (_, i) => ({
-            address: contractAddress,
-            abi: INVESTMENT_MANAGER_ABI,
-            functionName: "pools",
-            args: [BigInt(i)],
-          }))
-        : []),
-    ],
+    contracts,
     query: {
-      enabled: !!contractAddress && mounted,
+      enabled: !!contractAddress,
       refetchInterval: 10000,
     },
   })
@@ -181,33 +181,37 @@ export function useInvestmentManager() {
     }
   }
 
-  if (!mounted) {
-    return {
-      contractAddress: undefined,
-      accumulatedRewards: "0",
-      lastRoundRewards: { daily: "0", referral: "0", pools: "0" },
-      investorInfo: null,
-      totalInvestorsCount: 0,
-      totalDepositAmount: "0",
-      startTimestamp: 0,
-      pools: Array.from({ length: 9 }, (_, i) => ({
-        id: i,
-        isActive: false,
-        curReward: "0",
-        participantsCount: 0,
-        minInvestmentAmount: "0",
-        minDirectReferralsCount: 0,
-        minDirectReferralsDeposit: "0",
-        share: 0,
-      })),
-      isLoading: true,
-      isPending: false,
-      error: null,
-      refetch: () => {},
-      deposit,
-      claimReward,
-      setWhitelist,
-    }
+  // Default values for when data is not available
+  const defaultData = {
+    contractAddress,
+    accumulatedRewards: "0",
+    lastRoundRewards: { daily: "0", referral: "0", pools: "0" },
+    investorInfo: null,
+    totalInvestorsCount: 0,
+    totalDepositAmount: "0",
+    startTimestamp: 0,
+    pools: Array.from({ length: 9 }, (_, i) => ({
+      id: i,
+      isActive: false,
+      curReward: "0",
+      participantsCount: 0,
+      minInvestmentAmount: "0",
+      minDirectReferralsCount: 0,
+      minDirectReferralsDeposit: "0",
+      share: 0,
+    })),
+    isLoading,
+    isPending,
+    error,
+    refetch,
+    deposit,
+    claimReward,
+    setWhitelist,
+  }
+
+  // Return early with defaults if no contract address
+  if (!contractAddress) {
+    return defaultData
   }
 
   // Parse contract data with proper null checks

@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { WagmiProvider, cookieToInitialState } from "wagmi"
 import { RainbowKitProvider, darkTheme } from "@rainbow-me/rainbowkit"
 import { config } from "@/lib/config"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 
 interface ProvidersProps {
   children: React.ReactNode
@@ -13,7 +13,6 @@ interface ProvidersProps {
 }
 
 export function Providers({ children, cookie }: ProvidersProps) {
-  const [mounted, setMounted] = useState(false)
   const initialState = cookie ? cookieToInitialState(config, cookie) : undefined
 
   const [queryClient] = useState(
@@ -29,19 +28,6 @@ export function Providers({ children, cookie }: ProvidersProps) {
         },
       }),
   )
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  // Don't render providers until mounted to avoid hydration issues
-  if (!mounted) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    )
-  }
 
   return (
     <WagmiProvider config={config} initialState={initialState}>
