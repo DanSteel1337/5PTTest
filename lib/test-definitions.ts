@@ -2307,3 +2307,6 @@ export function getAllTestCategories(tokenContract: any, investmentContract: any
     createValidationTests()
   ]
 }
+
+// Ensure all exports are available
+export type { TestCase, TestResult, TestCategory }
