@@ -16,20 +16,7 @@ const nextConfig = {
       fs: false,
       net: false,
       tls: false,
-      crypto: false,
-      stream: false,
-      url: false,
-      zlib: false,
-      http: false,
-      https: false,
-      assert: false,
-      os: false,
-      path: false,
     }
-
-    // Ignore node modules warnings
-    config.ignoreWarnings = [{ module: /node_modules/ }, { file: /node_modules/ }]
-
     return config
   },
 }

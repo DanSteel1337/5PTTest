@@ -4,7 +4,7 @@ import { headers } from "next/headers"
 import { WalletErrorBoundary } from "@/components/error-boundary"
 
 export default async function Page() {
-  const cookieHeader = (await headers()).get("cookie")
+  const cookieHeader = (await headers()).get("cookie") || ""
 
   return (
     <Providers cookie={cookieHeader}>

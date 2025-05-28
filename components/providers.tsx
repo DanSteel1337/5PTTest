@@ -14,9 +14,7 @@ interface ProvidersProps {
 
 export function Providers({ children, cookie }: ProvidersProps) {
   const [mounted, setMounted] = useState(false)
-
-  // Initialize state from cookie for SSR
-  const initialState = cookieToInitialState(config, cookie)
+  const initialState = cookie ? cookieToInitialState(config, cookie) : undefined
 
   const [queryClient] = useState(
     () =>
@@ -27,8 +25,6 @@ export function Providers({ children, cookie }: ProvidersProps) {
             gcTime: 10 * 60 * 1000,
             retry: 3,
             refetchOnWindowFocus: false,
-            // Add error handling for WalletConnect issues
-            retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
           },
         },
       }),
@@ -53,10 +49,8 @@ export function Providers({ children, cookie }: ProvidersProps) {
         <RainbowKitProvider
           theme={darkTheme({
             accentColor: "#F0B90B",
-            accentColorForeground: "white",
           })}
           modalSize="compact"
-          showRecentTransactions={true}
         >
           {children}
         </RainbowKitProvider>

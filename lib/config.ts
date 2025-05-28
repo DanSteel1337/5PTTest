@@ -12,19 +12,9 @@ if (!projectId) {
 
 export const config = getDefaultConfig({
   appName: "Five Pillars Developer Dashboard",
-  projectId: projectId || "default_project_id", // Fallback to prevent errors
+  projectId: projectId || "placeholder_project_id", // Fallback for development only
   chains: [bscTestnet, bsc],
   ssr: true,
-  // Add wallet connect options to handle potential issues
-  walletConnectOptions: {
-    projectId: projectId || "default_project_id",
-    metadata: {
-      name: "Five Pillars Developer Dashboard",
-      description: "Test and debug Five Pillars smart contracts",
-      url: typeof window !== "undefined" ? window.location.origin : "https://localhost:3000",
-      icons: [],
-    },
-  },
 })
 
 export const CONTRACT_ADDRESSES = {

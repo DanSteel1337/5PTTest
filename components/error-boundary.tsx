@@ -17,11 +17,12 @@ export class WalletErrorBoundary extends React.Component<{ children: React.React
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    // Check if it's a WalletConnect related error
-    if (error.message.includes("apply") || error.message.includes("WalletConnect")) {
+    // Only catch WalletConnect specific errors - let RainbowKit handle the rest
+    if (error.message.includes("apply") && error.message.includes("heartbeat")) {
       return { hasError: true, error }
     }
-    return { hasError: false }
+    // Let other errors propagate normally
+    throw error
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
@@ -38,7 +39,7 @@ export class WalletErrorBoundary extends React.Component<{ children: React.React
               <div>
                 <div className="font-medium">WalletConnect Connection Issue</div>
                 <div className="text-sm">
-                  There was an issue connecting to WalletConnect. Please refresh the page and try again.
+                  There was an issue with the WalletConnect heartbeat. Please refresh the page and try again.
                 </div>
               </div>
               <Button size="sm" onClick={() => window.location.reload()} className="ml-4">
