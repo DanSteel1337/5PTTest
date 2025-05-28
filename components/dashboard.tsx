@@ -1,3 +1,4 @@
+```typescript
 "use client"
 
 import { useState, useEffect } from "react"
@@ -20,6 +21,7 @@ import { ReferralSystem } from "@/components/referral-system"
 import { PoolEligibilityChecker } from "@/components/pool-eligibility-checker"
 import { WhitelistManager } from "@/components/whitelist-manager"
 import { AllowanceChecker } from "@/components/allowance-checker"
+import { TestRunner } from "@/components/test-runner"
 import { isPoolEligible, calculateTimeRemaining } from "@/lib/utils"
 
 export function Dashboard() {
@@ -176,11 +178,12 @@ function DashboardContent() {
       {/* Main Content */}
       {isConnected && isCorrectNetwork && (
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="token">5PT Token</TabsTrigger>
             <TabsTrigger value="investment">Investment</TabsTrigger>
             <TabsTrigger value="tools">Tools</TabsTrigger>
+            <TabsTrigger value="tests">Tests</TabsTrigger>
             <TabsTrigger value="debug">Debug</TabsTrigger>
           </TabsList>
 
@@ -626,6 +629,11 @@ function DashboardContent() {
             </div>
           </TabsContent>
 
+          {/* Tests Tab */}
+          <TabsContent value="tests" className="space-y-6">
+            <TestRunner />
+          </TabsContent>
+
           {/* Debug Tab */}
           <TabsContent value="debug" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -729,3 +737,4 @@ function DashboardContent() {
     </div>
   )
 }
+```
