@@ -14,10 +14,12 @@ export function isPoolEligible(
   poolId: number,
   investmentAmount: string,
   directReferrals: number,
+  directReferralsDeposit: string,
   poolCriteria: {
     id: number
     minInvestmentAmount: string
     minDirectReferralsCount: number
+    minDirectReferralsDeposit: string
   }[],
 ): boolean {
   // Special pools 7-8 require whitelist
@@ -28,8 +30,14 @@ export function isPoolEligible(
 
   const investmentAmountNum = Number.parseFloat(investmentAmount)
   const minInvestmentAmountNum = Number.parseFloat(pool.minInvestmentAmount)
+  const directReferralsDepositNum = Number.parseFloat(directReferralsDeposit || "0")
+  const minDirectReferralsDepositNum = Number.parseFloat(pool.minDirectReferralsDeposit)
 
-  return investmentAmountNum >= minInvestmentAmountNum && directReferrals >= pool.minDirectReferralsCount
+  return (
+    investmentAmountNum >= minInvestmentAmountNum && 
+    directReferrals >= pool.minDirectReferralsCount &&
+    directReferralsDepositNum >= minDirectReferralsDepositNum
+  )
 }
 
 export function calculateTimeRemaining(lastDepositTimestamp: number): {

@@ -31,15 +31,17 @@ export function useInvestmentManager() {
               address: contractAddress,
               abi: INVESTMENT_MANAGER_ABI,
               functionName: "getAccumulatedRewards",
+              account: address,
             },
           ]
         : []),
-      ...(mounted
+      ...(address && mounted
         ? [
             {
               address: contractAddress,
               abi: INVESTMENT_MANAGER_ABI,
               functionName: "getLastRoundRewards",
+              account: address,
             },
           ]
         : []),
@@ -74,9 +76,9 @@ export function useInvestmentManager() {
             },
           ]
         : []),
-      // Pool data (first 5 pools)
+      // All 9 pools data
       ...(mounted
-        ? Array.from({ length: 5 }, (_, i) => ({
+        ? Array.from({ length: 9 }, (_, i) => ({
             address: contractAddress,
             abi: INVESTMENT_MANAGER_ABI,
             functionName: "pools",
@@ -188,13 +190,15 @@ export function useInvestmentManager() {
       totalInvestorsCount: 0,
       totalDepositAmount: "0",
       startTimestamp: 0,
-      pools: Array.from({ length: 5 }, (_, i) => ({
+      pools: Array.from({ length: 9 }, (_, i) => ({
         id: i,
         isActive: false,
         curReward: "0",
         participantsCount: 0,
         minInvestmentAmount: "0",
         minDirectReferralsCount: 0,
+        minDirectReferralsDeposit: "0",
+        share: 0,
       })),
       isLoading: true,
       isPending: false,
@@ -212,31 +216,39 @@ export function useInvestmentManager() {
   // Handle accumulated rewards
   const accumulatedRewards =
     address && contractData && contractData[dataIndex]?.result !== undefined
-      ? formatUnits(contractData[dataIndex].result, 18)
+      ? formatUnits(contractData[dataIndex].result as bigint, 18)
       : "0"
 
   if (address) dataIndex++
 
   // Handle last round rewards
   const lastRoundRewards =
-    contractData && contractData[dataIndex]?.result
+    address && contractData && contractData[dataIndex]?.result
       ? {
-          daily: formatUnits(contractData[dataIndex].result[0], 18),
-          referral: formatUnits(contractData[dataIndex].result[1], 18),
-          pools: formatUnits(contractData[dataIndex].result[2], 18),
+          daily: formatUnits((contractData[dataIndex].result as any)[0], 18),
+          referral: formatUnits((contractData[dataIndex].result as any)[1], 18),
+          pools: formatUnits((contractData[dataIndex].result as any)[2], 18),
         }
       : { daily: "0", referral: "0", pools: "0" }
 
-  dataIndex++
+  if (address) dataIndex++
 
   // Handle investor info
   const investorInfo =
     address && contractData && contractData[dataIndex]?.result
       ? {
-          totalDepositAmount: formatUnits(contractData[dataIndex].result[0], 18),
-          lastDepositTimestamp: Number(contractData[dataIndex].result[1]),
-          referer: contractData[dataIndex].result[2],
-          directReferralsCount: Number(contractData[dataIndex].result[3]),
+          totalDepositAmount: formatUnits((contractData[dataIndex].result as any)[0], 18),
+          directReferralsCount: Number((contractData[dataIndex].result as any)[1]),
+          downlineReferralsCount: Number((contractData[dataIndex].result as any)[2]),
+          directRefsDeposit: formatUnits((contractData[dataIndex].result as any)[3], 18),
+          downlineRefsDeposit: formatUnits((contractData[dataIndex].result as any)[4], 18),
+          referer: (contractData[dataIndex].result as any)[5],
+          lastDailyReward: formatUnits((contractData[dataIndex].result as any)[6], 18),
+          lastRefReward: formatUnits((contractData[dataIndex].result as any)[7], 18),
+          accumulatedReward: formatUnits((contractData[dataIndex].result as any)[8], 18),
+          lastClaimTimestamp: Number((contractData[dataIndex].result as any)[9]),
+          lastDepositTimestamp: Number((contractData[dataIndex].result as any)[10]),
+          updateRefRewardTimestamp: Number((contractData[dataIndex].result as any)[11]),
         }
       : null
 
@@ -251,7 +263,7 @@ export function useInvestmentManager() {
   // Handle total deposit amount
   const totalDepositAmount =
     contractData && contractData[dataIndex]?.result !== undefined
-      ? formatUnits(contractData[dataIndex].result, 18)
+      ? formatUnits(contractData[dataIndex].result as bigint, 18)
       : "0"
 
   dataIndex++
@@ -262,25 +274,33 @@ export function useInvestmentManager() {
 
   dataIndex++
 
-  // Handle pools data
-  const pools = Array.from({ length: 5 }, (_, i) => {
+  // Handle pools data (updated based on documentation)
+  const pools = Array.from({ length: 9 }, (_, i) => {
     const poolData = contractData && contractData[dataIndex + i]?.result
     return poolData
       ? {
           id: i,
-          isActive: poolData[0],
-          curReward: formatUnits(poolData[1], 18),
-          participantsCount: Number(poolData[2]),
-          minInvestmentAmount: formatUnits(poolData[3], 18),
-          minDirectReferralsCount: Number(poolData[4]),
+          isActive: (poolData as any)[0],
+          curReward: formatUnits((poolData as any)[1], 18),
+          lastReward: formatUnits((poolData as any)[2], 18),
+          participantsCount: Number((poolData as any)[3]),
+          rewardPerInvestorStored: formatUnits((poolData as any)[4], 18),
+          minInvestmentAmount: formatUnits((poolData as any)[5], 18),
+          minDirectReferralsDeposit: formatUnits((poolData as any)[6], 18),
+          minDirectReferralsCount: Number((poolData as any)[7]),
+          share: Number((poolData as any)[8]),
         }
       : {
           id: i,
           isActive: false,
           curReward: "0",
+          lastReward: "0",
           participantsCount: 0,
+          rewardPerInvestorStored: "0",
           minInvestmentAmount: "0",
+          minDirectReferralsDeposit: "0",
           minDirectReferralsCount: 0,
+          share: 0,
         }
   })
 
