@@ -1,4 +1,3 @@
-```typescript
 import { formatUnits, parseUnits, isAddress } from "viem"
 
 export interface TestCase {
@@ -2308,4 +2307,3 @@ export function getAllTestCategories(tokenContract: any, investmentContract: any
     createValidationTests()
   ]
 }
-```

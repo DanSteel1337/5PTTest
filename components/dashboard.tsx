@@ -1,4 +1,3 @@
-```typescript
 "use client"
 
 import { useState, useEffect } from "react"
@@ -15,7 +14,7 @@ import { Separator } from "@/components/ui/separator"
 import { useFivePillarsToken } from "@/hooks/use-five-pillars-token"
 import { useInvestmentManager } from "@/hooks/use-investment-manager"
 import { bsc, bscTestnet } from "wagmi/chains"
-import { AlertCircle, CheckCircle, Clock, DollarSign, Users, TrendingUp } from "lucide-react"
+import { AlertCircle, CheckCircle, Clock, DollarSign, Users, TrendingUp } from 'lucide-react'
 import { TransactionHistory } from "@/components/transaction-history"
 import { ReferralSystem } from "@/components/referral-system"
 import { PoolEligibilityChecker } from "@/components/pool-eligibility-checker"
@@ -43,21 +42,6 @@ function DashboardContent() {
   const chainId = useChainId()
   const { switchChain } = useSwitchChain()
   const [mounted, setMounted] = useState(false)
-
-  // Add error handling for WalletConnect
-  const [walletError, setWalletError] = useState<string | null>(null)
-
-  useEffect(() => {
-    // Handle WalletConnect errors
-    const handleError = (error: any) => {
-      if (error?.message?.includes("apply")) {
-        setWalletError("WalletConnect connection issue. Please try refreshing the page.")
-      }
-    }
-
-    window.addEventListener("error", handleError)
-    return () => window.removeEventListener("error", handleError)
-  }, [])
 
   // Form states
   const [transferTo, setTransferTo] = useState("")
@@ -149,19 +133,6 @@ function DashboardContent() {
             Please switch to BSC Testnet or BSC Mainnet to interact with contracts.
             <Button size="sm" onClick={() => switchChain({ chainId: bscTestnet.id })}>
               Switch to BSC Testnet
-            </Button>
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* WalletConnect Error Warning */}
-      {walletError && (
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription className="flex items-center justify-between">
-            {walletError}
-            <Button size="sm" onClick={() => setWalletError(null)}>
-              Dismiss
             </Button>
           </AlertDescription>
         </Alert>
@@ -737,4 +708,3 @@ function DashboardContent() {
     </div>
   )
 }
-```

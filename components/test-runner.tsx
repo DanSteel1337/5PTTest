@@ -1,4 +1,3 @@
-```typescript
 "use client"
 
 import { useState, useEffect } from "react"
@@ -486,4 +485,3 @@ export function TestRunner() {
     </div>
   )
 }
-```
