@@ -4,7 +4,7 @@ import { getDefaultConfig } from "@rainbow-me/rainbowkit"
 import { bsc, bscTestnet } from "wagmi/chains"
 
 // Use the environment variable for the WalletConnect project ID
-const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || ""
+const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
 
 if (!projectId) {
   console.warn("Missing NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID environment variable")
@@ -12,9 +12,19 @@ if (!projectId) {
 
 export const config = getDefaultConfig({
   appName: "Five Pillars Developer Dashboard",
-  projectId: projectId,
+  projectId: projectId || "default_project_id", // Fallback to prevent errors
   chains: [bscTestnet, bsc],
   ssr: true,
+  // Add wallet connect options to handle potential issues
+  walletConnectOptions: {
+    projectId: projectId || "default_project_id",
+    metadata: {
+      name: "Five Pillars Developer Dashboard",
+      description: "Test and debug Five Pillars smart contracts",
+      url: typeof window !== "undefined" ? window.location.origin : "https://localhost:3000",
+      icons: [],
+    },
+  },
 })
 
 export const CONTRACT_ADDRESSES = {

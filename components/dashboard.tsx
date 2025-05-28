@@ -42,6 +42,21 @@ function DashboardContent() {
   const { switchChain } = useSwitchChain()
   const [mounted, setMounted] = useState(false)
 
+  // Add error handling for WalletConnect
+  const [walletError, setWalletError] = useState<string | null>(null)
+
+  useEffect(() => {
+    // Handle WalletConnect errors
+    const handleError = (error: any) => {
+      if (error?.message?.includes("apply")) {
+        setWalletError("WalletConnect connection issue. Please try refreshing the page.")
+      }
+    }
+
+    window.addEventListener("error", handleError)
+    return () => window.removeEventListener("error", handleError)
+  }, [])
+
   // Form states
   const [transferTo, setTransferTo] = useState("")
   const [transferAmount, setTransferAmount] = useState("")
@@ -132,6 +147,19 @@ function DashboardContent() {
             Please switch to BSC Testnet or BSC Mainnet to interact with contracts.
             <Button size="sm" onClick={() => switchChain({ chainId: bscTestnet.id })}>
               Switch to BSC Testnet
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* WalletConnect Error Warning */}
+      {walletError && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription className="flex items-center justify-between">
+            {walletError}
+            <Button size="sm" onClick={() => setWalletError(null)}>
+              Dismiss
             </Button>
           </AlertDescription>
         </Alert>
@@ -569,7 +597,7 @@ function DashboardContent() {
                     <ul className="text-sm space-y-1 text-muted-foreground">
                       <li>• Minimum deposit: 1 5PT token</li>
                       <li>• 4-hour delay between deposits</li>
-                      <li>• Referrer can only be set once</li>
+                      <li>• Referrer can only be set only once</li>
                       <li>• 50% of claimed rewards are redistributed</li>
                       <li>• Pool eligibility updates automatically</li>
                     </ul>
