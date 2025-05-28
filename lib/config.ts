@@ -4,15 +4,11 @@ import { getDefaultConfig } from "@rainbow-me/rainbowkit"
 import { bsc, bscTestnet } from "wagmi/chains"
 
 // Ensure we have a valid project ID
-const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
-
-if (!projectId) {
-  console.warn("NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID is not set. Using demo project ID.")
-}
+const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "YOUR_PROJECT_ID"
 
 export const config = getDefaultConfig({
   appName: "Five Pillars Developer Dashboard",
-  projectId: projectId || "demo-project-id-for-development",
+  projectId: projectId,
   chains: [bscTestnet, bsc],
   ssr: true,
 })

@@ -2,17 +2,15 @@
 
 import type React from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { WagmiProvider, cookieToInitialState } from "wagmi"
+import { WagmiProvider } from "wagmi"
 import { RainbowKitProvider, darkTheme } from "@rainbow-me/rainbowkit"
 import { config } from "@/lib/config"
 import { useState, useEffect } from "react"
 
 export function Providers({
   children,
-  cookie,
 }: {
   children: React.ReactNode
-  cookie?: string
 }) {
   const [mounted, setMounted] = useState(false)
   const [queryClient] = useState(
@@ -38,10 +36,8 @@ export function Providers({
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>
   }
 
-  const initialState = cookieToInitialState(config, cookie)
-
   return (
-    <WagmiProvider config={config} initialState={initialState}>
+    <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider
           theme={darkTheme({

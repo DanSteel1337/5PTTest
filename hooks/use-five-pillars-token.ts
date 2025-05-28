@@ -4,11 +4,18 @@ import { useReadContracts, useWriteContract, useAccount, useChainId } from "wagm
 import { FIVE_PILLARS_TOKEN_ABI } from "@/lib/abis"
 import { getContractAddress } from "@/lib/config"
 import { formatUnits, parseUnits } from "viem"
+import { useState, useEffect } from "react"
 
 export function useFivePillarsToken() {
   const { address } = useAccount()
   const chainId = useChainId()
-  const contractAddress = getContractAddress(chainId, "fivePillarsToken")
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const contractAddress = mounted ? getContractAddress(chainId, "fivePillarsToken") : undefined
   const { writeContract, isPending, error } = useWriteContract()
 
   const {
@@ -16,45 +23,47 @@ export function useFivePillarsToken() {
     isLoading,
     refetch,
   } = useReadContracts({
-    contracts: [
-      {
-        address: contractAddress,
-        abi: FIVE_PILLARS_TOKEN_ABI,
-        functionName: "name",
-      },
-      {
-        address: contractAddress,
-        abi: FIVE_PILLARS_TOKEN_ABI,
-        functionName: "symbol",
-      },
-      {
-        address: contractAddress,
-        abi: FIVE_PILLARS_TOKEN_ABI,
-        functionName: "decimals",
-      },
-      {
-        address: contractAddress,
-        abi: FIVE_PILLARS_TOKEN_ABI,
-        functionName: "totalSupply",
-      },
-      {
-        address: contractAddress,
-        abi: FIVE_PILLARS_TOKEN_ABI,
-        functionName: "owner",
-      },
-      ...(address
-        ? [
-            {
-              address: contractAddress,
-              abi: FIVE_PILLARS_TOKEN_ABI,
-              functionName: "balanceOf",
-              args: [address],
-            },
-          ]
-        : []),
-    ],
+    contracts: mounted
+      ? [
+          {
+            address: contractAddress,
+            abi: FIVE_PILLARS_TOKEN_ABI,
+            functionName: "name",
+          },
+          {
+            address: contractAddress,
+            abi: FIVE_PILLARS_TOKEN_ABI,
+            functionName: "symbol",
+          },
+          {
+            address: contractAddress,
+            abi: FIVE_PILLARS_TOKEN_ABI,
+            functionName: "decimals",
+          },
+          {
+            address: contractAddress,
+            abi: FIVE_PILLARS_TOKEN_ABI,
+            functionName: "totalSupply",
+          },
+          {
+            address: contractAddress,
+            abi: FIVE_PILLARS_TOKEN_ABI,
+            functionName: "owner",
+          },
+          ...(address
+            ? [
+                {
+                  address: contractAddress,
+                  abi: FIVE_PILLARS_TOKEN_ABI,
+                  functionName: "balanceOf",
+                  args: [address],
+                },
+              ]
+            : []),
+        ]
+      : [],
     query: {
-      enabled: !!contractAddress,
+      enabled: !!contractAddress && mounted,
       refetchInterval: 10000,
     },
   })
@@ -146,6 +155,28 @@ export function useFivePillarsToken() {
     } catch (error) {
       console.error("Set investment manager error:", error)
       throw error
+    }
+  }
+
+  // Default values for when not mounted
+  if (!mounted) {
+    return {
+      contractAddress: undefined,
+      tokenData: {
+        name: "Five Pillars Token",
+        symbol: "5PT",
+        decimals: 18,
+        totalSupply: "0",
+        owner: "0x0000000000000000000000000000000000000000",
+        balance: "0",
+      },
+      isLoading: true,
+      isPending: false,
+      error: null,
+      refetch: () => {},
+      transfer,
+      approve,
+      setInvestmentManager,
     }
   }
 

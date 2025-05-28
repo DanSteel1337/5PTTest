@@ -4,11 +4,18 @@ import { useReadContracts, useWriteContract, useAccount, useChainId } from "wagm
 import { INVESTMENT_MANAGER_ABI } from "@/lib/abis"
 import { getContractAddress } from "@/lib/config"
 import { formatUnits, parseUnits } from "viem"
+import { useState, useEffect } from "react"
 
 export function useInvestmentManager() {
   const { address } = useAccount()
   const chainId = useChainId()
-  const contractAddress = getContractAddress(chainId, "investmentManager")
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const contractAddress = mounted ? getContractAddress(chainId, "investmentManager") : undefined
   const { writeContract, isPending, error } = useWriteContract()
 
   const {
@@ -18,7 +25,7 @@ export function useInvestmentManager() {
   } = useReadContracts({
     contracts: [
       // Core reward data
-      ...(address
+      ...(address && mounted
         ? [
             {
               address: contractAddress,
@@ -27,13 +34,17 @@ export function useInvestmentManager() {
             },
           ]
         : []),
-      {
-        address: contractAddress,
-        abi: INVESTMENT_MANAGER_ABI,
-        functionName: "getLastRoundRewards",
-      },
+      ...(mounted
+        ? [
+            {
+              address: contractAddress,
+              abi: INVESTMENT_MANAGER_ABI,
+              functionName: "getLastRoundRewards",
+            },
+          ]
+        : []),
       // Investor information
-      ...(address
+      ...(address && mounted
         ? [
             {
               address: contractAddress,
@@ -44,31 +55,37 @@ export function useInvestmentManager() {
           ]
         : []),
       // System statistics
-      {
-        address: contractAddress,
-        abi: INVESTMENT_MANAGER_ABI,
-        functionName: "getTotalInvestorsCount",
-      },
-      {
-        address: contractAddress,
-        abi: INVESTMENT_MANAGER_ABI,
-        functionName: "totalDepositAmount",
-      },
-      {
-        address: contractAddress,
-        abi: INVESTMENT_MANAGER_ABI,
-        functionName: "startTimestamp",
-      },
+      ...(mounted
+        ? [
+            {
+              address: contractAddress,
+              abi: INVESTMENT_MANAGER_ABI,
+              functionName: "getTotalInvestorsCount",
+            },
+            {
+              address: contractAddress,
+              abi: INVESTMENT_MANAGER_ABI,
+              functionName: "totalDepositAmount",
+            },
+            {
+              address: contractAddress,
+              abi: INVESTMENT_MANAGER_ABI,
+              functionName: "startTimestamp",
+            },
+          ]
+        : []),
       // Pool data (first 5 pools)
-      ...Array.from({ length: 5 }, (_, i) => ({
-        address: contractAddress,
-        abi: INVESTMENT_MANAGER_ABI,
-        functionName: "pools",
-        args: [BigInt(i)],
-      })),
+      ...(mounted
+        ? Array.from({ length: 5 }, (_, i) => ({
+            address: contractAddress,
+            abi: INVESTMENT_MANAGER_ABI,
+            functionName: "pools",
+            args: [BigInt(i)],
+          }))
+        : []),
     ],
     query: {
-      enabled: !!contractAddress,
+      enabled: !!contractAddress && mounted,
       refetchInterval: 10000,
     },
   })
@@ -159,6 +176,33 @@ export function useInvestmentManager() {
     } catch (error) {
       console.error("Set whitelist error:", error)
       throw error
+    }
+  }
+
+  if (!mounted) {
+    return {
+      contractAddress: undefined,
+      accumulatedRewards: "0",
+      lastRoundRewards: { daily: "0", referral: "0", pools: "0" },
+      investorInfo: null,
+      totalInvestorsCount: 0,
+      totalDepositAmount: "0",
+      startTimestamp: 0,
+      pools: Array.from({ length: 5 }, (_, i) => ({
+        id: i,
+        isActive: false,
+        curReward: "0",
+        participantsCount: 0,
+        minInvestmentAmount: "0",
+        minDirectReferralsCount: 0,
+      })),
+      isLoading: true,
+      isPending: false,
+      error: null,
+      refetch: () => {},
+      deposit,
+      claimReward,
+      setWhitelist,
     }
   }
 

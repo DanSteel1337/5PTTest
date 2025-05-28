@@ -23,6 +23,20 @@ import { AllowanceChecker } from "@/components/allowance-checker"
 import { isPoolEligible, calculateTimeRemaining } from "@/lib/utils"
 
 export function Dashboard() {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return <div className="flex items-center justify-center min-h-screen">Loading dashboard...</div>
+  }
+
+  return <DashboardContent />
+}
+
+function DashboardContent() {
   const { address, isConnected } = useAccount()
   const chainId = useChainId()
   const { switchChain } = useSwitchChain()
