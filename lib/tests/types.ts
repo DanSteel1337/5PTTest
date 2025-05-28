@@ -1,46 +1,71 @@
-export interface TestCase {
-  id: string
-  category: string
-  name: string
-  description: string
-  execute: () => Promise<TestResult>
-  skip?: boolean
-}
-
 export interface TestResult {
   testId: string
   passed: boolean
   expected: any
   actual: any
   error?: string
-  transactionHash?: string
-  gasUsed?: bigint
   executionTime: number
+  transactionHash?: string
   onChainResult?: {
     method: string
     result: any
   }
 }
 
+export interface TestCase {
+  id: string
+  category: string
+  name: string
+  description: string
+  skip?: boolean
+  execute: () => Promise<TestResult>
+}
+
 export interface TestCategory {
   name: string
+  description: string
   tests: TestCase[]
 }
 
-// Test helper functions
-export const compareValues = (expected: any, actual: any, tolerance = 0): boolean => {
-  if (typeof expected === "number" && typeof actual === "number") {
-    return Math.abs(expected - actual) <= tolerance
+// Helper function to create a default test result
+export function createDefaultTestResult(testId: string): TestResult {
+  return {
+    testId,
+    passed: false,
+    expected: "Test to execute successfully",
+    actual: "Test not executed",
+    executionTime: 0,
   }
-  return expected === actual
 }
 
-export const formatTestValue = (value: any): string => {
-  if (typeof value === "bigint") {
-    return value.toString()
+// Helper function to safely create a test case
+export function createTestCase(
+  id: string,
+  category: string,
+  name: string,
+  description: string,
+  execute: () => Promise<TestResult>,
+  skip?: boolean,
+): TestCase {
+  return {
+    id,
+    category,
+    name,
+    description,
+    skip,
+    execute: async () => {
+      try {
+        return await execute()
+      } catch (error) {
+        return {
+          testId: id,
+          passed: false,
+          expected: "Test to execute without errors",
+          actual: "Test execution failed",
+          error: error instanceof Error ? error.message : String(error),
+          executionTime: 0,
+        }
+      }
+    },
   }
-  if (typeof value === "object") {
-    return JSON.stringify(value, null, 2)
-  }
-  return String(value)
 }
