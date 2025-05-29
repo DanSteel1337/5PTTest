@@ -3,7 +3,7 @@
 import { getDefaultConfig } from "@rainbow-me/rainbowkit"
 import { bsc, bscTestnet } from "wagmi/chains"
 
-// Use the environment variable for the WalletConnect project ID
+// Use the existing environment variable
 const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID
 
 if (!projectId) {
@@ -17,6 +17,7 @@ export const config = getDefaultConfig({
   ssr: true,
 })
 
+// Public contract addresses - no need to hide these
 export const CONTRACT_ADDRESSES = {
   [bscTestnet.id]: {
     fivePillarsToken: "0xD9482A362b121090306E8A997Bd4B5196399DF00",
