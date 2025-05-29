@@ -1,3 +1,4 @@
+// Test result interface
 export interface TestResult {
   testId: string
   passed: boolean
@@ -12,60 +13,58 @@ export interface TestResult {
   }
 }
 
+// Individual test case interface
 export interface TestCase {
   id: string
-  category: string
   name: string
-  description: string
+  description?: string
   skip?: boolean
   execute: () => Promise<TestResult>
 }
 
+// Test category interface
 export interface TestCategory {
   name: string
-  description: string
+  description?: string
   tests: TestCase[]
 }
 
-// Helper function to create a default test result
-export function createDefaultTestResult(testId: string): TestResult {
-  return {
-    testId,
-    passed: false,
-    expected: "Test to execute successfully",
-    actual: "Test not executed",
-    executionTime: 0,
-  }
+// Test execution context
+export interface TestContext {
+  address: string
+  tokenContract: any
+  investmentContract: any
 }
 
-// Helper function to safely create a test case
-export function createTestCase(
-  id: string,
-  category: string,
-  name: string,
-  description: string,
-  execute: () => Promise<TestResult>,
-  skip?: boolean,
-): TestCase {
-  return {
-    id,
-    category,
-    name,
-    description,
-    skip,
-    execute: async () => {
-      try {
-        return await execute()
-      } catch (error) {
-        return {
-          testId: id,
-          passed: false,
-          expected: "Test to execute without errors",
-          actual: "Test execution failed",
-          error: error instanceof Error ? error.message : String(error),
-          executionTime: 0,
-        }
-      }
-    },
-  }
+// Test validation helpers
+export interface ValidationResult {
+  isValid: boolean
+  errors: string[]
+}
+
+// Mock data interfaces for testing
+export interface MockInvestorData {
+  totalDepositAmount: string
+  directReferralsCount: number
+  directRefsDeposit: string
+  referer: string
+  lastDepositTimestamp: number
+}
+
+export interface MockPoolData {
+  id: number
+  isActive: boolean
+  minInvestmentAmount: string
+  minDirectReferralsCount: number
+  minDirectReferralsDeposit: string
+  curReward: string
+  participantsCount: number
+}
+
+// Test utilities
+export interface TestUtilities {
+  parseContractError: (error: Error) => string
+  formatTokenAmount: (amount: string) => string
+  validateAddress: (address: string) => boolean
+  calculateTimeRemaining: (timestamp: number) => { canDeposit: boolean; timeRemaining: string }
 }

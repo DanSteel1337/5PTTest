@@ -1,8 +1,8 @@
 // Export types
-export * from "./types"
+export type { TestCategory, TestCase, TestResult } from "./types"
 
 // Export test creators
-import type { TestCategory, TestCase, TestResult } from "./types"
+import type { TestCategory } from "./types"
 import { createTokenContractTests } from "./token-tests"
 import { createInvestmentManagerTests } from "./investment-tests"
 import { createDepositTests } from "./deposit-tests"
@@ -47,5 +47,3 @@ export function getAllTestCategories(tokenContract: any, investmentContract: any
     return []
   }
 }
-
-export type { TestCategory, TestCase, TestResult }

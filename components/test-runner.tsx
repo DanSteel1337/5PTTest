@@ -25,7 +25,8 @@ import {
 import { useFivePillarsToken } from "@/hooks/use-five-pillars-token"
 import { useInvestmentManager } from "@/hooks/use-investment-manager"
 import { cn } from "@/lib/utils"
-import { getAllTestCategories, type TestResult, type TestCase } from "@/lib/tests"
+import { getAllTestCategories } from "@/lib/tests"
+import type { TestResult, TestCase } from "@/lib/tests/types"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export function TestRunner() {
