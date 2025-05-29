@@ -4,6 +4,7 @@ import { useReadContracts, useWriteContract, useAccount, useChainId } from "wagm
 import { INVESTMENT_MANAGER_ABI } from "@/lib/abis"
 import { getContractAddress } from "@/lib/config"
 import { formatUnits, parseUnits } from "viem"
+import { addTransactionToHistory } from "@/lib/transactions"
 
 export function useInvestmentManager() {
   const { address } = useAccount()
@@ -102,19 +103,7 @@ export function useInvestmentManager() {
         args: [parseUnits(amount, 18), (referer || "0x0000000000000000000000000000000000000000") as `0x${string}`],
       })
 
-      // Add to transaction history if available
-      if (typeof window !== "undefined" && window.addTransaction && result) {
-        // @ts-ignore
-        window.addTransaction({
-          hash: result,
-          from: address || "",
-          to: contractAddress,
-          status: "pending",
-          contract: "investment",
-          method: "deposit",
-        })
-      }
-
+      addTransactionToHistory(result, address || "", contractAddress, "investment", "deposit")
       return result
     } catch (error) {
       console.error("Deposit error:", error)
@@ -131,19 +120,7 @@ export function useInvestmentManager() {
         functionName: "claimReward",
       })
 
-      // Add to transaction history if available
-      if (typeof window !== "undefined" && window.addTransaction && result) {
-        // @ts-ignore
-        window.addTransaction({
-          hash: result,
-          from: address || "",
-          to: contractAddress,
-          status: "pending",
-          contract: "investment",
-          method: "claimReward",
-        })
-      }
-
+      addTransactionToHistory(result, address || "", contractAddress, "investment", "claimReward")
       return result
     } catch (error) {
       console.error("Claim reward error:", error)
@@ -161,19 +138,7 @@ export function useInvestmentManager() {
         args: [investor as `0x${string}`, poolId, add],
       })
 
-      // Add to transaction history if available
-      if (typeof window !== "undefined" && window.addTransaction && result) {
-        // @ts-ignore
-        window.addTransaction({
-          hash: result,
-          from: address || "",
-          to: contractAddress,
-          status: "pending",
-          contract: "investment",
-          method: "setWhitelist",
-        })
-      }
-
+      addTransactionToHistory(result, address || "", contractAddress, "investment", "setWhitelist")
       return result
     } catch (error) {
       console.error("Set whitelist error:", error)

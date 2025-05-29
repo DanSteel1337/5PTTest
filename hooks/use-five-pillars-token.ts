@@ -4,6 +4,7 @@ import { useReadContracts, useWriteContract, useAccount, useChainId } from "wagm
 import { FIVE_PILLARS_TOKEN_ABI } from "@/lib/abis"
 import { getContractAddress } from "@/lib/config"
 import { formatUnits, parseUnits } from "viem"
+import { addTransactionToHistory } from "@/lib/transactions"
 
 export function useFivePillarsToken() {
   const { address } = useAccount()
@@ -78,19 +79,7 @@ export function useFivePillarsToken() {
         args: [to as `0x${string}`, parseUnits(amount, 18)],
       })
 
-      // Add to transaction history if available
-      if (typeof window !== "undefined" && window.addTransaction && result) {
-        // @ts-ignore
-        window.addTransaction({
-          hash: result,
-          from: address || "",
-          to: contractAddress,
-          status: "pending",
-          contract: "token",
-          method: "transfer",
-        })
-      }
-
+      addTransactionToHistory(result, address || "", contractAddress, "token", "transfer")
       return result
     } catch (error) {
       console.error("Transfer error:", error)
@@ -108,19 +97,7 @@ export function useFivePillarsToken() {
         args: [spender as `0x${string}`, parseUnits(amount, 18)],
       })
 
-      // Add to transaction history if available
-      if (typeof window !== "undefined" && window.addTransaction && result) {
-        // @ts-ignore
-        window.addTransaction({
-          hash: result,
-          from: address || "",
-          to: contractAddress,
-          status: "pending",
-          contract: "token",
-          method: "approve",
-        })
-      }
-
+      addTransactionToHistory(result, address || "", contractAddress, "token", "approve")
       return result
     } catch (error) {
       console.error("Approve error:", error)
@@ -138,19 +115,7 @@ export function useFivePillarsToken() {
         args: [manager as `0x${string}`],
       })
 
-      // Add to transaction history if available
-      if (typeof window !== "undefined" && window.addTransaction && result) {
-        // @ts-ignore
-        window.addTransaction({
-          hash: result,
-          from: address || "",
-          to: contractAddress,
-          status: "pending",
-          contract: "token",
-          method: "setInvestmentManager",
-        })
-      }
-
+      addTransactionToHistory(result, address || "", contractAddress, "token", "setInvestmentManager")
       return result
     } catch (error) {
       console.error("Set investment manager error:", error)
