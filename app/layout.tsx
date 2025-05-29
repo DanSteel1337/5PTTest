@@ -1,7 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-import '@rainbow-me/rainbowkit/styles.css'
 import "./globals.css"
 import { Providers } from "@/components/providers"
 import { headers } from "next/headers"
@@ -20,13 +19,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   const cookie = headers().get("cookie") ?? ""
-  
+
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Providers cookie={cookie}>
-          {children}
-        </Providers>
+        <Providers cookie={cookie}>{children}</Providers>
       </body>
     </html>
   )

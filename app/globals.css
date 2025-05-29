@@ -1,3 +1,13 @@
+/* BEGIN: @rainbow-me/rainbowkit styles */
+/*
+* IMPORTANT: Please manually copy the entire content of the file
+* 'node_modules/@rainbow-me/rainbowkit/styles.css'
+* and paste it here to ensure RainbowKit styles are applied in the v0 preview.
+*/
+
+/* PASTE RAINBOWKIT CSS CONTENT HERE */
+
+/* END: @rainbow-me/rainbowkit styles */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
